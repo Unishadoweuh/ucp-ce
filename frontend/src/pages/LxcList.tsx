@@ -138,6 +138,7 @@ export default function LxcList() {
             renderCell: (params) => (
                 <Typography
                     variant="body1"
+                    onClick={() => navigate(`/resource/lxc/${params.row.node}/${params.row.vmid}`)}
                     sx={{ color: accentBlue, fontWeight: 500, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                 >
                     {params.value}

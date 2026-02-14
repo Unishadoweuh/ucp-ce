@@ -19,6 +19,7 @@ import Activity from './pages/Activity';
 import CloudShell from './pages/CloudShell';
 import Billing from './pages/Billing';
 import Alerts from './pages/Alerts';
+import ResourceDetail from './pages/ResourceDetail';
 import AdminUsers from './pages/admin/Users';
 import AdminMachineTypes from './pages/admin/MachineTypes';
 import AdminStorageConfig from './pages/admin/StorageConfig';
@@ -56,6 +57,7 @@ function App() {
                             <Route path="compute/shell" element={<CloudShell />} />
                             <Route path="billing" element={<Billing />} />
                             <Route path="operations/alerts" element={<Alerts />} />
+                            <Route path="resource/:type/:node/:vmid" element={<ResourceDetail />} />
                             {/* Admin routes */}
                             <Route path="admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
                             <Route path="admin/machine-types" element={<AdminRoute><AdminMachineTypes /></AdminRoute>} />

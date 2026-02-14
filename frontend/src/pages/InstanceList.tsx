@@ -139,6 +139,7 @@ export default function InstanceList() {
             renderCell: (params) => (
                 <Typography
                     variant="body1"
+                    onClick={() => navigate(`/resource/qemu/${params.row.node}/${params.row.vmid}`)}
                     sx={{ color: accentBlue, fontWeight: 500, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                 >
                     {params.value}
