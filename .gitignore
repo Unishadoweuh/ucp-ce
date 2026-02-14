@@ -1,0 +1,50 @@
+# ─── Environment ─────────────────────────────────────────────
+.env
+.env.local
+.env.production
+
+# ─── Python ──────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+*.egg
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# ─── Node ────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.npm
+*.tsbuildinfo
+
+# ─── IDE ─────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# ─── Docker ──────────────────────────────────────────────────
+pgdata/
+
+# ─── OS ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs ────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ─── Gemini / AI Agent ──────────────────────────────────────
+.gemini/
+.agent/

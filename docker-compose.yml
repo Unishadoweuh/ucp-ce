@@ -1,0 +1,58 @@
+services:
+  # ─── PostgreSQL ────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ucp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ucp_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-ucp_vm}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ucp}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ─── Backend (FastAPI) ─────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ucp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ucp_secret}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-ucp_vm}
+      PROXMOX_HOST: ${PROXMOX_HOST}
+      PROXMOX_TOKEN_NAME: ${PROXMOX_TOKEN_NAME}
+      PROXMOX_TOKEN_VALUE: ${PROXMOX_TOKEN_VALUE}
+      PROXMOX_VERIFY_SSL: ${PROXMOX_VERIFY_SSL:-false}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ─── Frontend (React → Nginx) ─────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
