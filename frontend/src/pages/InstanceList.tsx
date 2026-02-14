@@ -12,6 +12,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogActions,
+    Drawer,
     Snackbar,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -25,6 +26,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StatusChip from '../components/StatusChip';
 import { fetchInstances, instanceAction, deleteInstance } from '../api/client';
+import CreateInstance from './CreateInstance';
 
 interface Instance {
     vmid: number;
@@ -59,6 +61,7 @@ export default function InstanceList() {
     const [selected, setSelected] = useState<GridRowSelectionModel>([]);
     const [deleteDialog, setDeleteDialog] = useState<Instance | null>(null);
     const [snack, setSnack] = useState({ open: false, message: '' });
+    const [createOpen, setCreateOpen] = useState(false);
 
     const load = useCallback(() => {
         setLoading(true);
@@ -240,7 +243,7 @@ export default function InstanceList() {
                     <Button variant="outlined" startIcon={<RefreshIcon />} onClick={load} size="small">
                         Refresh
                     </Button>
-                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/compute/instances/create')}>
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
                         Create Instance
                     </Button>
                 </Box>
@@ -322,6 +325,18 @@ export default function InstanceList() {
                 onClose={() => setSnack({ ...snack, open: false })}
                 message={snack.message}
             />
+
+            {/* Create Drawer */}
+            <Drawer
+                anchor="right"
+                open={createOpen}
+                onClose={() => setCreateOpen(false)}
+                sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: 680 }, p: 0 } }}
+            >
+                <Box sx={{ height: '100%', overflow: 'auto', p: 3 }}>
+                    <CreateInstance onSuccess={() => { setCreateOpen(false); load(); }} onCancel={() => setCreateOpen(false)} embedded />
+                </Box>
+            </Drawer>
         </Box>
     );
 }

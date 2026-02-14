@@ -25,6 +25,8 @@ from app.routers import (
     networks,
     audit,
     shell,
+    billing,
+    alerts,
 )
 
 # ── Rate limiter ─────────────────────────────────────────────
@@ -39,7 +41,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="UCP VM — Unified Cloud Platform",
     description="GCP-style VM & LXC management for Proxmox VE",
-    version="0.5.0",
+    version="0.6.0",
     lifespan=lifespan,
 )
 
@@ -77,8 +79,10 @@ app.include_router(logs.router, prefix="/api")
 app.include_router(networks.router, prefix="/api")
 app.include_router(audit.router, prefix="/api")
 app.include_router(shell.router, prefix="/api")
+app.include_router(billing.router, prefix="/api")
+app.include_router(alerts.router, prefix="/api")
 
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "service": "ucp-vm", "version": "0.5.0"}
+    return {"status": "ok", "service": "ucp-vm", "version": "0.6.0"}

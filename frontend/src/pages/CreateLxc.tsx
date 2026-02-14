@@ -25,7 +25,13 @@ import { fetchNodes, fetchLxcTemplates } from '../api/client';
 interface NodeOption { node: string; status: string }
 interface TemplateOption { volid: string; node: string; storage: string }
 
-export default function CreateLxc() {
+interface CreateLxcProps {
+    onSuccess?: () => void;
+    onCancel?: () => void;
+    embedded?: boolean;
+}
+
+export default function CreateLxc({ onSuccess, onCancel, embedded }: CreateLxcProps = {}) {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
     const navigate = useNavigate();
@@ -78,7 +84,11 @@ export default function CreateLxc() {
         try {
             await axios.post('/api/lxc', form);
             setSnack({ open: true, message: `Container "${form.name}" is being created...` });
-            setTimeout(() => navigate('/compute/lxc'), 1500);
+            if (onSuccess) {
+                setTimeout(onSuccess, 800);
+            } else {
+                setTimeout(() => navigate('/compute/lxc'), 1500);
+            }
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to create container');
         } finally {
@@ -95,7 +105,7 @@ export default function CreateLxc() {
 
     return (
         <Box sx={{ maxWidth: 800 }}>
-            <Typography variant="h4" sx={{ mb: 3 }}>Create LXC Container</Typography>
+            <Typography variant={embedded ? 'h5' : 'h4'} sx={{ mb: 3 }}>Create LXC Container</Typography>
 
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
@@ -293,7 +303,7 @@ export default function CreateLxc() {
             <Divider sx={{ my: 2 }} />
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button onClick={() => navigate('/compute/lxc')}>Cancel</Button>
+                <Button onClick={() => onCancel ? onCancel() : navigate('/compute/lxc')}>Cancel</Button>
                 <Button
                     variant="contained"
                     startIcon={<SaveIcon />}

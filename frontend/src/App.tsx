@@ -17,6 +17,8 @@ import Logs from './pages/Logs';
 import Networks from './pages/Networks';
 import Activity from './pages/Activity';
 import CloudShell from './pages/CloudShell';
+import Billing from './pages/Billing';
+import Alerts from './pages/Alerts';
 import AdminUsers from './pages/admin/Users';
 import AdminMachineTypes from './pages/admin/MachineTypes';
 import AdminStorageConfig from './pages/admin/StorageConfig';
@@ -52,6 +54,8 @@ function App() {
                             <Route path="networking/vpc" element={<Networks />} />
                             <Route path="operations/activity" element={<Activity />} />
                             <Route path="compute/shell" element={<CloudShell />} />
+                            <Route path="billing" element={<Billing />} />
+                            <Route path="operations/alerts" element={<Alerts />} />
                             {/* Admin routes */}
                             <Route path="admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
                             <Route path="admin/machine-types" element={<AdminRoute><AdminMachineTypes /></AdminRoute>} />

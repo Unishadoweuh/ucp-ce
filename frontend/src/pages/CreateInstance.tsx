@@ -65,7 +65,13 @@ interface StoragePool {
     avail_gb: number;
 }
 
-export default function CreateInstance() {
+interface CreateInstanceProps {
+    onSuccess?: () => void;
+    onCancel?: () => void;
+    embedded?: boolean;
+}
+
+export default function CreateInstance({ onSuccess, onCancel, embedded }: CreateInstanceProps = {}) {
     const navigate = useNavigate();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
@@ -147,7 +153,11 @@ export default function CreateInstance() {
                 tags,
             });
             setSnack({ open: true, message: `Instance "${name}" is being created...` });
-            setTimeout(() => navigate('/compute/instances'), 1500);
+            if (onSuccess) {
+                setTimeout(onSuccess, 800);
+            } else {
+                setTimeout(() => navigate('/compute/instances'), 1500);
+            }
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to create instance');
         } finally {
@@ -192,12 +202,17 @@ export default function CreateInstance() {
     return (
         <Box sx={{ maxWidth: 900 }}>
             {/* ── Header ──────────────────────────────────────── */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                <IconButton onClick={() => navigate('/compute/instances')}>
-                    <ArrowBackIcon />
-                </IconButton>
-                <Typography variant="h4">Create an instance</Typography>
-            </Box>
+            {!embedded && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                    <IconButton onClick={() => navigate('/compute/instances')}>
+                        <ArrowBackIcon />
+                    </IconButton>
+                    <Typography variant="h4">Create an instance</Typography>
+                </Box>
+            )}
+            {embedded && (
+                <Typography variant="h5" sx={{ mb: 3 }}>Create an instance</Typography>
+            )}
 
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
@@ -433,7 +448,7 @@ export default function CreateInstance() {
 
             {/* ── Actions ─────────────────────────────────────── */}
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                <Button variant="outlined" onClick={() => navigate('/compute/instances')}>
+                <Button variant="outlined" onClick={() => onCancel ? onCancel() : navigate('/compute/instances')}>
                     Cancel
                 </Button>
                 <Button

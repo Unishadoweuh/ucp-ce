@@ -12,6 +12,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogActions,
+    Drawer,
     Snackbar,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -25,6 +26,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import StatusChip from '../components/StatusChip';
 import { fetchLxcList, lxcAction, deleteLxc } from '../api/client';
+import CreateLxc from './CreateLxc';
 
 interface LxcRow {
     vmid: number;
@@ -58,6 +60,7 @@ export default function LxcList() {
     const [selected, setSelected] = useState<GridRowSelectionModel>([]);
     const [deleteDialog, setDeleteDialog] = useState<LxcRow | null>(null);
     const [snack, setSnack] = useState({ open: false, message: '' });
+    const [createOpen, setCreateOpen] = useState(false);
 
     const load = useCallback(() => {
         setLoading(true);
@@ -239,7 +242,7 @@ export default function LxcList() {
                     <Button variant="outlined" startIcon={<RefreshIcon />} onClick={load} size="small">
                         Refresh
                     </Button>
-                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/compute/lxc/create')}>
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
                         Create Container
                     </Button>
                 </Box>
@@ -321,6 +324,18 @@ export default function LxcList() {
                 onClose={() => setSnack({ ...snack, open: false })}
                 message={snack.message}
             />
+
+            {/* Create Drawer */}
+            <Drawer
+                anchor="right"
+                open={createOpen}
+                onClose={() => setCreateOpen(false)}
+                sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: 680 }, p: 0 } }}
+            >
+                <Box sx={{ height: '100%', overflow: 'auto', p: 3 }}>
+                    <CreateLxc onSuccess={() => { setCreateOpen(false); load(); }} onCancel={() => setCreateOpen(false)} embedded />
+                </Box>
+            </Drawer>
         </Box>
     );
 }

@@ -56,6 +56,8 @@ const labelMap: Record<string, string> = {
     operations: 'Operations',
     activity: 'Activity',
     shell: 'Cloud Shell',
+    billing: 'Billing',
+    alerts: 'Alerts',
 };
 
 export default function Layout() {

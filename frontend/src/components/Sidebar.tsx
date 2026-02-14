@@ -31,6 +31,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import LanIcon from '@mui/icons-material/Lan';
 import HistoryIcon from '@mui/icons-material/History';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { useAuth } from '../AuthContext';
 
 interface SidebarProps {
@@ -68,6 +70,11 @@ const networkNav: NavItem[] = [
 
 const opsNav: NavItem[] = [
     { label: 'Activity', path: '/operations/activity', icon: <HistoryIcon /> },
+    { label: 'Alerts', path: '/operations/alerts', icon: <NotificationsActiveIcon /> },
+];
+
+const billingNav: NavItem[] = [
+    { label: 'Billing', path: '/billing', icon: <AttachMoneyIcon /> },
 ];
 
 const adminNav: NavItem[] = [
@@ -87,6 +94,7 @@ export default function Sidebar({ drawerWidth, collapsedWidth, mobileOpen, onClo
         compute: true,
         networking: true,
         operations: true,
+        billing: true,
         admin: true,
     });
 
@@ -182,6 +190,8 @@ export default function Sidebar({ drawerWidth, collapsedWidth, mobileOpen, onClo
             {renderSection('Networking', networkNav, 'networking')}
             <Divider sx={{ my: 0.5 }} />
             {renderSection('Operations', opsNav, 'operations')}
+            <Divider sx={{ my: 0.5 }} />
+            {renderSection('Billing', billingNav, 'billing')}
             {isAdmin && (
                 <>
                     <Divider sx={{ my: 0.5 }} />
