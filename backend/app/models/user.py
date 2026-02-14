@@ -13,6 +13,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(256), nullable=False)
     picture: Mapped[str] = mapped_column(String(512), nullable=True)
     role: Mapped[str] = mapped_column(String(16), nullable=False, default="user")  # admin | user
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")  # pending | approved | rejected
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     last_login: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -22,6 +22,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import PersonIcon from '@mui/icons-material/Person';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import BlockIcon from '@mui/icons-material/Block';
 import axios from 'axios';
 
 interface UserRow {
@@ -30,6 +32,7 @@ interface UserRow {
     name: string;
     picture: string | null;
     role: string;
+    status: string;
     quota?: {
         id: number;
         user_id: number;
@@ -92,6 +95,16 @@ export default function AdminUsers() {
         }
     };
 
+    const handleStatus = async (user: UserRow, newStatus: string) => {
+        try {
+            await axios.put(`/api/admin/users/${user.id}/status`, { status: newStatus });
+            setSnack({ open: true, message: `${user.name} is now ${newStatus}` });
+            load();
+        } catch (err: any) {
+            setSnack({ open: true, message: err.response?.data?.detail || 'Failed to update status' });
+        }
+    };
+
     const accentBlue = isDark ? '#8ab4f8' : '#1a73e8';
     const borderColor = isDark ? '#3c4043' : '#dadce0';
     const headerBg = isDark ? '#35363a' : '#f8f9fa';
@@ -125,6 +138,24 @@ export default function AdminUsers() {
             ),
         },
         {
+            field: 'status',
+            headerName: 'Status',
+            width: 120,
+            renderCell: (params) => {
+                const color = params.value === 'approved' ? '#34a853' : params.value === 'pending' ? '#fbbc04' : '#ea4335';
+                return (
+                    <Chip
+                        label={params.value}
+                        size="small"
+                        sx={{
+                            fontWeight: 600, textTransform: 'capitalize', fontSize: '0.7rem',
+                            bgcolor: `${color}20`, color,
+                        }}
+                    />
+                );
+            },
+        },
+        {
             field: 'quota_vcpus',
             headerName: 'Max vCPUs',
             width: 110,
@@ -151,7 +182,7 @@ export default function AdminUsers() {
         {
             field: 'actions',
             headerName: '',
-            width: 100,
+            width: 180,
             sortable: false,
             renderCell: (params) => (
                 <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -165,6 +196,27 @@ export default function AdminUsers() {
                             {params.row.role === 'admin' ? <PersonIcon fontSize="small" /> : <AdminPanelSettingsIcon fontSize="small" />}
                         </IconButton>
                     </Tooltip>
+                    {params.row.status === 'pending' && (
+                        <>
+                            <Tooltip title="Approve">
+                                <IconButton size="small" onClick={() => handleStatus(params.row, 'approved')} sx={{ color: '#34a853' }}>
+                                    <CheckCircleIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Reject">
+                                <IconButton size="small" onClick={() => handleStatus(params.row, 'rejected')} sx={{ color: '#ea4335' }}>
+                                    <BlockIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        </>
+                    )}
+                    {params.row.status === 'rejected' && (
+                        <Tooltip title="Re-approve">
+                            <IconButton size="small" onClick={() => handleStatus(params.row, 'approved')} sx={{ color: '#34a853' }}>
+                                <CheckCircleIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                 </Box>
             ),
         },

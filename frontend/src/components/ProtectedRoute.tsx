@@ -2,9 +2,10 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { Box, CircularProgress } from '@mui/material';
 import type { ReactNode } from 'react';
+import PendingApproval from '../pages/PendingApproval';
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-    const { isAuthenticated, loading, token } = useAuth();
+    const { isAuthenticated, isPending, loading, token } = useAuth();
 
     // Wait for auth to finish loading
     if (loading) {
@@ -20,7 +21,11 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         return <Navigate to="/login" replace />;
     }
 
-    // Only render children when we're sure the user is authenticated AND token is set
-    // This ensures axios has been configured with the Authorization header
+    // Show pending approval page for unapproved users
+    if (isPending) {
+        return <PendingApproval />;
+    }
+
+    // Only render children when we're sure the user is authenticated AND approved
     return <>{children}</>;
 }

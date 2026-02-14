@@ -9,7 +9,7 @@ from app.database import get_db
 from app.services.auth import require_admin
 from app.models.user import User, Quota
 from app.models.storage_config import StorageConfig
-from app.schemas.user import UserWithQuota, QuotaRead, QuotaUpdate, RoleUpdate
+from app.schemas.user import UserWithQuota, QuotaRead, QuotaUpdate, RoleUpdate, StatusUpdate
 from app.schemas.storage_config import StorageConfigRead, StorageConfigCreate, StorageConfigUpdate
 
 router = APIRouter(prefix="/admin", tags=["Administration"])
@@ -24,7 +24,7 @@ async def list_users(admin: User = Depends(require_admin), db: AsyncSession = De
     return [
         UserWithQuota(
             id=u.id, google_id=u.google_id, email=u.email, name=u.name,
-            picture=u.picture, role=u.role,
+            picture=u.picture, role=u.role, status=u.status,
             quota=QuotaRead.model_validate(u.quota) if u.quota else None,
         )
         for u in users
@@ -77,6 +77,27 @@ async def update_user_role(
     user.role = body.role
     await db.commit()
     return {"id": user_id, "role": body.role}
+
+
+@router.put("/users/{user_id}/status")
+async def update_user_status(
+    user_id: int,
+    body: StatusUpdate,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Approve or reject a user."""
+    if body.status not in ("approved", "rejected", "pending"):
+        raise HTTPException(status_code=400, detail="Status must be 'approved', 'rejected', or 'pending'")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.status = body.status
+    await db.commit()
+    return {"id": user_id, "status": body.status}
 
 
 # ── Storage Config ───────────────────────────────────────────

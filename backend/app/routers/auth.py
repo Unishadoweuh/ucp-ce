@@ -7,7 +7,7 @@ from slowapi.util import get_remote_address
 
 from app.database import get_db
 from app.schemas.user import GoogleLoginRequest, AuthResponse, UserWithQuota, QuotaRead, QuotaUsage
-from app.services.auth import verify_google_token, create_jwt, upsert_user, get_current_user
+from app.services.auth import verify_google_token, create_jwt, upsert_user, get_current_user, get_current_user_any_status
 from app.services import proxmox
 from app.models.user import User
 
@@ -18,7 +18,9 @@ limiter = Limiter(key_func=get_remote_address)
 @router.post("/google", response_model=AuthResponse)
 @limiter.limit("10/minute")
 async def google_login(request: Request, body: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
-    """Authenticate with Google. First user becomes admin."""
+    """Authenticate with Google. First user becomes admin + approved.
+    Other users start as 'pending' until admin approves.
+    """
     google_payload = verify_google_token(body.credential)
     user = await upsert_user(db, google_payload)
     token = create_jwt(user)
@@ -36,14 +38,15 @@ async def google_login(request: Request, body: GoogleLoginRequest, db: AsyncSess
             name=user.name,
             picture=user.picture,
             role=user.role,
+            status=user.status,
             quota=quota_data,
         ),
     )
 
 
 @router.get("/me", response_model=UserWithQuota)
-async def get_me(user: User = Depends(get_current_user)):
-    """Return the current user + quota."""
+async def get_me(user: User = Depends(get_current_user_any_status)):
+    """Return the current user + quota. Allows pending users to check their status."""
     quota_data = None
     if user.quota:
         quota_data = QuotaRead.model_validate(user.quota)
@@ -55,6 +58,7 @@ async def get_me(user: User = Depends(get_current_user)):
         name=user.name,
         picture=user.picture,
         role=user.role,
+        status=user.status,
         quota=quota_data,
     )
 

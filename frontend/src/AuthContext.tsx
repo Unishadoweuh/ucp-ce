@@ -8,6 +8,7 @@ interface User {
     name: string;
     picture: string | null;
     role: string;
+    status: string;
     quota?: {
         id: number;
         user_id: number;
@@ -22,6 +23,7 @@ interface AuthContextType {
     user: User | null;
     token: string | null;
     isAdmin: boolean;
+    isPending: boolean;
     isAuthenticated: boolean;
     loading: boolean;
     login: (googleCredential: string) => Promise<void>;
@@ -32,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
     user: null,
     token: null,
     isAdmin: false,
+    isPending: false,
     isAuthenticated: false,
     loading: true,
     login: async () => { },
@@ -115,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user,
                 token,
                 isAdmin: user?.role === 'admin',
+                isPending: user?.status === 'pending',
                 isAuthenticated: !!user,
                 loading,
                 login,

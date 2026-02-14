@@ -13,6 +13,7 @@ class UserRead(BaseModel):
     name: str
     picture: Optional[str] = None
     role: str
+    status: str = "approved"
 
     model_config = {"from_attributes": True}
 
@@ -37,6 +38,10 @@ class QuotaUpdate(BaseModel):
 
 class RoleUpdate(BaseModel):
     role: str  # "admin" | "user"
+
+
+class StatusUpdate(BaseModel):
+    status: str  # "approved" | "rejected"
 
 
 class UserWithQuota(UserRead):
